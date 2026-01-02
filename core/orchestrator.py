@@ -1,40 +1,56 @@
 from core.state import State
 
+# 🔗 Kafka integration (Member 2)
+from infra.kafka_producer import emit_event
+from infra.events import build_event
+
 
 class Orchestrator:
     """
     Executes a Flow by running tasks in order,
-    managing state and audit logs.
+    managing state, audit logs, and emitting Kafka events.
     """
 
     def run(self, flow, input_data):
-        # Initialize state
         state = State(flow.name)
         state.data["input"] = input_data
 
-        # Start execution from the defined start task
         current_task = flow.start_task
 
         while current_task:
             task = flow.tasks[current_task]
-
-            # Provide full state snapshot to the agent
             agent_input = state.data.copy()
 
-            # Execute agent
-            output = task.agent.run(agent_input)
-
-            # Record execution
-            state.record(
-                task=current_task,
-                input_data=agent_input,
-                output_data=output
+            # 🔔 EVENT: Task Started
+            emit_event(
+                build_event(state.flow_id, current_task, "STARTED")
             )
 
-            # Move to next task (simple linear execution)
-            current_task = task.next_tasks[0] if task.next_tasks else None
+            try:
+                output = task.agent.run(agent_input)
 
-        # Persist audit logs
+                # Record execution
+                state.record(
+                    task=current_task,
+                    input_data=agent_input,
+                    output_data=output
+                )
+
+                # 🔔 EVENT: Task Completed
+                emit_event(
+                    build_event(state.flow_id, current_task, "COMPLETED")
+                )
+
+                # Move to next task
+                current_task = task.next_tasks[0] if task.next_tasks else None
+
+            except Exception as e:
+                # 🔔 EVENT: Task Failed
+                emit_event(
+                    build_event(state.flow_id, current_task, "FAILED")
+                )
+                raise e
+
+        # Save audit logs
         state.save()
-
         return state.data
