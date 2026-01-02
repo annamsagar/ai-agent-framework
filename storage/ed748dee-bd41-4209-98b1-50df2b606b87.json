@@ -1,0 +1,25 @@
+[
+  {
+    "task": "step1",
+    "input": {
+      "input": 1
+    },
+    "output": {
+      "value": 2
+    },
+    "timestamp": 1767377945.367209
+  },
+  {
+    "task": "step2",
+    "input": {
+      "input": 1,
+      "step1": {
+        "value": 2
+      }
+    },
+    "output": {
+      "value": 3
+    },
+    "timestamp": 1767377945.3672135
+  }
+]

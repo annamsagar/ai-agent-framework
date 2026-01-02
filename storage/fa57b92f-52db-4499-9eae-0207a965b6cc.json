@@ -1,0 +1,41 @@
+[
+  {
+    "task": "ingest",
+    "input": {
+      "input": "AI agents are powerful"
+    },
+    "output": {
+      "text": "AI agents are powerful"
+    },
+    "timestamp": 1767383035.2681384
+  },
+  {
+    "task": "embed",
+    "input": {
+      "input": "AI agents are powerful",
+      "ingest": {
+        "text": "AI agents are powerful"
+      }
+    },
+    "output": {
+      "embedding": 22
+    },
+    "timestamp": 1767383035.2723277
+  },
+  {
+    "task": "answer",
+    "input": {
+      "input": "AI agents are powerful",
+      "ingest": {
+        "text": "AI agents are powerful"
+      },
+      "embed": {
+        "embedding": 22
+      }
+    },
+    "output": {
+      "answer": "Answer generated using embedding size 22"
+    },
+    "timestamp": 1767383035.2763257
+  }
+]
